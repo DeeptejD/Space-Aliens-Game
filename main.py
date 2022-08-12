@@ -24,18 +24,26 @@ x_change = 0
 y_change = 0
 
 # enemy ufo
-ufo_sprite = pygame.image.load('ufo.png')
-ufoX = random.randint(0, 736)
-ufoY = random.randint(0, 200)
-ufoxchange = 0.5
-ufoychange = 40
+ufo_sprite = []
+ufoX = []
+ufoY = []
+ufoxchange = []
+ufoychange = []
+num_ufos = 6
+
+for i in range (0, num_ufos):
+    ufo_sprite.append(pygame.image.load('ufo.png')) 
+    ufoX.append(random.randint(0, 735))
+    ufoY.append(random.randint(50, 200))
+    ufoxchange.append(0.5)
+    ufoychange.append(40)
 
 # bullet
 bullet = pygame.image.load('bullet.png')
 bulletX = 0  # will be changed in the while loop
 bulletY = 480  # 480 because bullet is always starting at the same level at the player
 bulletxchange = 0
-bulletychange = -5
+bulletychange = -20
 # the state of the bullet
 bullet_state = 'ready'  # ready state is when u can't see the bullet
 
@@ -52,8 +60,8 @@ def player(x, y):
     screen.blit(sprite, (x, y))
 
 
-def ufo(x, y):
-    screen.blit(ufo_sprite, (x, y))
+def ufo(x, y, i):
+    screen.blit(ufo_sprite[i], (x, y))
 
 
 def fire_bullet(x, y):
@@ -103,13 +111,25 @@ while running:
     elif playerX >= 736:
         playerX = 736
 
-    ufoX += ufoxchange
-    if ufoX < 0:
-        ufoxchange = 0.5
-        ufoY += ufoychange
-    elif ufoX >= 736:
-        ufoxchange = -0.5
-        ufoY += ufoychange
+    for i in range(num_ufos):
+        ufoX[i] += ufoxchange[i]
+        if ufoX[i] < 0:
+            ufoxchange[i] = 0.5
+            ufoY[i] += ufoychange[i]
+        elif ufoX[i] >= 736:
+            ufoxchange[i] = -0.5
+            ufoY[i] += ufoychange[i]
+        collision = is_collision(ufoX[i], ufoY[i], bulletX, bulletY)
+        if collision:
+            bulletY = 480
+            bullet_state = 'ready'
+            score += 1
+            print(score)
+            ufoX[i] = random.randint(0, 735)
+            ufoY[i] = random.randint(50, 150)
+        
+        ufo(ufoX[i], ufoY[i], i)
+
     if bulletY <= 0:
         bullet_state = 'ready'
         bulletY = 480
@@ -118,17 +138,8 @@ while running:
         bulletX = playerX
         fire_bullet(bulletX, bulletY)
         bulletY += bulletychange
-
-    collision = is_collision(ufoX, ufoY, bulletX, bulletY)
-    if collision:
-        bulletY = 480
-        bullet_state = 'ready'
-        score += 1
-        print(score)
-        ufoX = random.randint(0, 800)
-        ufoY = random.randint(50, 150)
+    
 
     player(playerX, playerY)
-    ufo(ufoX, ufoY)
 
     pygame.display.update()
