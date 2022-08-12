@@ -1,7 +1,7 @@
 import pygame
 import math
 import random
-
+from pygame import mixer
 
 pygame.init()
 
@@ -14,7 +14,9 @@ pygame.display.set_icon(icon)
 pygame.display.set_caption('UFO Buster!')
 # background
 background = pygame.image.load('background.jpg')
-
+# backgrounf sound
+mixer.music.load('8_bit_bg.wav')
+mixer.music.play(-1)
 
 # player
 sprite = pygame.image.load('arcade-game.png')
@@ -31,11 +33,12 @@ ufoxchange = []
 ufoychange = []
 num_ufos = 6
 
+ufo_x_speed = 0.5
 for i in range(0, num_ufos):
     ufo_sprite.append(pygame.image.load('ufo.png'))
     ufoX.append(random.randint(0, 735))
     ufoY.append(random.randint(50, 200))
-    ufoxchange.append(0.5)
+    ufoxchange.append(ufo_x_speed)
     ufoychange.append(40)
 
 # bullet
@@ -54,7 +57,7 @@ bullet_state = 'ready'  # ready state is when u can't see the bullet
 
 # score
 score_value = 0
-font = pygame.font.Font('freesansbold.ttf', 32)
+font = pygame.font.Font('sunny.otf', 32)
 
 text_x = 10
 text_y = 10
@@ -105,6 +108,8 @@ while running:
                 x_change = 0.8
 
             if event.key == pygame.K_SPACE:
+                bullet_sound = mixer.Sound('laser.wav')
+                bullet_sound.play()
                 if bullet_state == 'ready':
                     fire_bullet(playerX, bulletY)
 
@@ -129,6 +134,9 @@ while running:
             ufoY[i] += ufoychange[i]
         collision = is_collision(ufoX[i], ufoY[i], bulletX, bulletY)
         if collision:
+            explosion_sound = mixer.Sound('explosion.wav')
+            explosion_sound.play()
+            ufo_x_speed += 1
             bulletY = 480
             bullet_state = 'ready'
             score_value += 1
@@ -136,7 +144,7 @@ while running:
             ufoY[i] = random.randint(50, 150)
 
         ufo(ufoX[i], ufoY[i], i)
-
+    
     if bulletY <= 0:
         bullet_state = 'ready'
         bulletY = 480
