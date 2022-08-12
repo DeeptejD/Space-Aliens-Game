@@ -14,7 +14,7 @@ pygame.display.set_icon(icon)
 pygame.display.set_caption('UFO Buster!')
 # background
 background = pygame.image.load('background.jpg')
-# backgrounf sound
+# background sound
 mixer.music.load('8_bit_bg.wav')
 mixer.music.play(-1)
 
@@ -33,7 +33,7 @@ ufoxchange = []
 ufoychange = []
 num_ufos = 6
 
-ufo_x_speed = 0.5
+ufo_x_speed = 1
 for i in range(0, num_ufos):
     ufo_sprite.append(pygame.image.load('ufo.png'))
     ufoX.append(random.randint(0, 735))
@@ -43,17 +43,12 @@ for i in range(0, num_ufos):
 
 # bullet
 bullet = pygame.image.load('bullet.png')
-bulletX = 0  # will be changed in the while loop
-bulletY = 480  # 480 because bullet is always starting at the same level at the player
+bulletX = 0 
+bulletY = 480 
 bulletxchange = 0
 bulletychange = -20
 # the state of the bullet
-bullet_state = 'ready'  # ready state is when u can't see the bullet
-
-
-# fire state would mean that the bullet is currently moving
-
-# updating variables
+bullet_state = 'ready' 
 
 # score
 score_value = 0
@@ -89,6 +84,12 @@ def is_collision(x1, y1, x2, y2):
         return False
 
 
+# gameover font
+over_font = pygame.font.Font('sunny.otf', 64)
+def gameover_text():
+    game_over = over_font.render('GAME OVER!\nFinal Score: {}'.format(score_value), True, (255, 255, 255))
+    screen.blit(game_over, (135, 250))
+
 running = True
 
 while running:
@@ -97,14 +98,10 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        #     checking if any key is pressed on the keyboard
         if event.type == pygame.KEYDOWN:
-            # print('A keystroke has been pressed')
             if event.key == pygame.K_LEFT:
                 x_change = -0.8
-                # print('Left arrow key has been pressed')
             if event.key == pygame.K_RIGHT:
-                # print('Right arrow key was pressed')
                 x_change = 0.8
 
             if event.key == pygame.K_SPACE:
@@ -115,7 +112,6 @@ while running:
 
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
-                # y_change = 0
                 x_change = 0
 
     playerX += x_change
@@ -125,18 +121,26 @@ while running:
         playerX = 736
 
     for i in range(num_ufos):
+        #game over
+        if ufoY[i] > 440:
+            for j in range(num_ufos):
+                ufoY[j] = 2000
+            gameover_text()
+            break
+
         ufoX[i] += ufoxchange[i]
         if ufoX[i] < 0:
-            ufoxchange[i] = 0.5
+            ufoxchange[i] = ufo_x_speed
             ufoY[i] += ufoychange[i]
         elif ufoX[i] >= 736:
-            ufoxchange[i] = -0.5
+            ufoxchange[i] = -ufo_x_speed
             ufoY[i] += ufoychange[i]
         collision = is_collision(ufoX[i], ufoY[i], bulletX, bulletY)
         if collision:
             explosion_sound = mixer.Sound('explosion.wav')
             explosion_sound.play()
-            ufo_x_speed += 1
+            if ufo_x_speed <=3:
+                ufo_x_speed += 0.2
             bulletY = 480
             bullet_state = 'ready'
             score_value += 1
