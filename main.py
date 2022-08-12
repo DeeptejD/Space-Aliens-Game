@@ -47,6 +47,7 @@ bullet_state = 'ready'  # ready state is when u can't see the bullet
 # score
 score = 0
 
+
 def player(x, y):
     screen.blit(sprite, (x, y))
 
@@ -62,7 +63,7 @@ def fire_bullet(x, y):
 
 
 def is_collision(x1, y1, x2, y2):
-    distance = math.sqrt((math.pow((x2 - x1), 2)) + (math.pow((y2 - y1), 2)))
+    distance = math.sqrt((math.pow(x2-x1,2))+(math.pow(y2-y1,2)))
     if distance < 27:
         return True
     else:
@@ -86,10 +87,7 @@ while running:
             if event.key == pygame.K_RIGHT:
                 # print('Right arrow key was pressed')
                 x_change = 0.8
-            # if event.key == pygame.K_UP:
-            #     y_change = -0.5
-            # if event.key == pygame.K_DOWN:
-            #     y_change = 0.5
+
             if event.key == pygame.K_SPACE:
                 if bullet_state == 'ready':
                     fire_bullet(playerX, bulletY)
@@ -121,18 +119,16 @@ while running:
         fire_bullet(bulletX, bulletY)
         bulletY += bulletychange
 
-    collision = is_collision(ufoX, ufoY, playerX, playerY)
+    collision = is_collision(ufoX, ufoY, bulletX, bulletY)
     if collision:
         bulletY = 480
         bullet_state = 'ready'
         score += 1
         print(score)
-        # ufoX = random.randint((0, 800))
-        # ufoY = random.randint((50, 150))
-    
+        ufoX = random.randint(0, 800)
+        ufoY = random.randint(50, 150)
 
     player(playerX, playerY)
     ufo(ufoX, ufoY)
-
 
     pygame.display.update()
