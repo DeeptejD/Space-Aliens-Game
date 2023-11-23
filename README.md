@@ -1,5 +1,5 @@
 # Space-Aliens-Game
-### Made my very first game using Pygame :)
+### Made my first game using Pygame :)
 ---
 #### Screenshots
 
